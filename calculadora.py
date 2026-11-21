@@ -3,7 +3,7 @@ import ast
 import FreeSimpleGUI as sg
 
 # Variáveis e etcs
-linhas_visíveis = 5
+linhas_visíveis = 2
 historico = []
 limite_caracteres_expressao = 16
 limite_caracteres_resposta = 12
@@ -13,14 +13,14 @@ def criar_layout():
     global window
     sg.theme("DarkBlue17")
     layout = [
-        [sg.Input("",  key="display_de_cima", size=(1, 1), expand_x=True, justification='left', readonly=True)],
-        [sg.Input("0.",  key="display_debaixo", size=(1, 1), expand_x=True, justification='right', text_color='white', readonly=True)],
-        [sg.Button("OFF", key="OFF", size=(2, 2), button_color="crimson"), sg.Button("AC", key="AC", size=(2, 2), button_color="navy"), sg.Button("CE", key="CE", size=(2, 2), button_color="navy"), sg.Button("←", key="←", size=(2, 2), button_color="navy")],
-        [sg.Button("1", key="1", size=(2, 2)), sg.Button("2", key="2", size=(2, 2)), sg.Button("3", key="3", size=(2, 2)), sg.Button("+", key="+", size=(2, 2), button_color="navy")],
-        [sg.Button("4", key="4", size=(2, 2)), sg.Button("5", key="5", size=(2, 2)), sg.Button("6", key="6", size=(2, 2)), sg.Button("-", key="-", size=(2, 2), button_color="navy")],
-        [sg.Button("7", key="7", size=(2, 2)), sg.Button("8", key="8", size=(2, 2)), sg.Button("9", key="9", size=(2, 2)), sg.Button("*", key="*", size=(2, 2), button_color="navy")],
-        [sg.Button("0", key="0", size=(2, 2)), sg.Button(".", key=".", size=(2, 2), button_color="navy"), sg.Button("=", key="=", size=(2, 2), button_color="navy"), sg.Button("/", key="/", size=(2, 2), button_color="navy")],
-        [sg.Text("Histórico:")],
+        [sg.Input("",  key="display_de_cima", size=(1, 1), expand_x=True, justification='left', readonly=True, pad=(0, 0), border_width=0)],
+        [sg.Input("0.",  key="display_debaixo", size=(1, 1), expand_x=True, justification='right', text_color='white', readonly=True, pad=(0, 0), border_width=0)],
+        [sg.Button("OFF", key="OFF", size=(5, 2), button_color="red"), sg.Button("AC", key="AC", size=(5, 2), button_color="navy"), sg.Button("CE", key="CE", size=(5, 2), button_color="navy"), sg.Button("←", key="←", size=(5, 2), button_color="navy")],
+        [sg.Button("1", key="1", size=(5, 2)), sg.Button("2", key="2", size=(5, 2)), sg.Button("3", key="3", size=(5, 2)), sg.Button("+", key="+", size=(5, 2), button_color="navy")],
+        [sg.Button("4", key="4", size=(5, 2)), sg.Button("5", key="5", size=(5, 2)), sg.Button("6", key="6", size=(5, 2)), sg.Button("-", key="-", size=(5, 2), button_color="navy")],
+        [sg.Button("7", key="7", size=(5, 2)), sg.Button("8", key="8", size=(5, 2)), sg.Button("9", key="9", size=(5, 2)), sg.Button("*", key="*", size=(5, 2), button_color="navy")],
+        [sg.Button("0", key="0", size=(5, 2)), sg.Button(".", key=".", size=(5, 2)), sg.Button("=", key="=", size=(5, 2), button_color="navy"), sg.Button("/", key="/", size=(5, 2), button_color="navy")],
+        [sg.Text("Histórico:", expand_x=True), sg.Button("LH", key="LH", button_color=("black", "yellow"))],
         [sg.Listbox(values=[], key="historico", size=(1,linhas_visíveis), expand_x=True)]
         
         ]
@@ -103,10 +103,15 @@ def calcular(expressão):
 
 def tratar_erro(mensagem):
     window["display_de_cima"].Widget.configure(justify="right")
+    window["display_de_cima"].update(mensagem)
     window["display_debaixo"].update("")
 
 def adicionar_ao_historico(expressão, resposta):
     historico.append(f"{expressão} = {resposta}")
+    window["historico"].update(values=historico)
+
+def limpar_historico():
+    historico.clear()
     window["historico"].update(values=historico)
 
 def main():
@@ -116,6 +121,8 @@ def main():
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == "OFF":
             break
+        elif event == "LH":
+            limpar_historico()
         elif event in "0123456789.+-*/":
             expressão += event
             atualizar_display_superior(expressão)
