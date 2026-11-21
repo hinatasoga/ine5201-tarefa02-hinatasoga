@@ -1,4 +1,5 @@
 # Importações
+import ast
 import FreeSimpleGUI as sg
 
 # Variáveis e etcs
@@ -23,15 +24,20 @@ def criar_layout():
     window = sg.Window("Calculadora", layout)
     return window
 
+def atualizar_display_superior(expressão):
+    window["display_de_cima"].update(expressão)
 
-def atualizar_display(valor):
+
+def atualizar_display_inferior(resposta):
+    window["display_debaixo"].update(resposta)
     
-def calcular(expressao):
-    
+def calcular(expressão):
+
 def tratar_erro(mensagem):
     
-def adicionar_ao_historico(expressao, resultado):
-    
+def adicionar_ao_historico(expressão, resposta):
+
 def main():
-    
+    pass
+
 # Loop de eventos da GUI
