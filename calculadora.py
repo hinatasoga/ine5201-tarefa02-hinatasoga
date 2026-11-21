@@ -15,11 +15,11 @@ def criar_layout():
     layout = [
         [sg.Input("",  key="display_de_cima", size=(1, 1), expand_x=True, justification='left', readonly=True)],
         [sg.Input("0.",  key="display_debaixo", size=(1, 1), expand_x=True, justification='right', text_color='white', readonly=True)],
-        [sg.Button("OFF", key="OFF", size=(2, 2), button_color="crimson"), sg.Button("C", key="C", size=(2, 2), button_color="navy"), sg.Button("CE", key="CE", size=(2, 2), button_color="navy"), sg.Button("←", key="←", size=(2, 2), button_color="navy")],
+        [sg.Button("OFF", key="OFF", size=(2, 2), button_color="crimson"), sg.Button("AC", key="AC", size=(2, 2), button_color="navy"), sg.Button("CE", key="CE", size=(2, 2), button_color="navy"), sg.Button("←", key="←", size=(2, 2), button_color="navy")],
         [sg.Button("1", key="1", size=(2, 2)), sg.Button("2", key="2", size=(2, 2)), sg.Button("3", key="3", size=(2, 2)), sg.Button("+", key="+", size=(2, 2), button_color="navy")],
         [sg.Button("4", key="4", size=(2, 2)), sg.Button("5", key="5", size=(2, 2)), sg.Button("6", key="6", size=(2, 2)), sg.Button("-", key="-", size=(2, 2), button_color="navy")],
         [sg.Button("7", key="7", size=(2, 2)), sg.Button("8", key="8", size=(2, 2)), sg.Button("9", key="9", size=(2, 2)), sg.Button("*", key="*", size=(2, 2), button_color="navy")],
-        [sg.Button("0", key="0", size=(2, 2)), sg.Button("=", key="=", size=(4, 2), button_color="navy"), sg.Button("/", key="/", size=(2, 2), button_color="navy")],
+        [sg.Button("0", key="0", size=(2, 2)), sg.Button(".", key=".", size=(2, 2), button_color="navy"), sg.Button("=", key="=", size=(2, 2), button_color="navy"), sg.Button("/", key="/", size=(2, 2), button_color="navy")],
         [sg.Text("Histórico:")],
         [sg.Listbox(values=[], key="historico", size=(1,linhas_visíveis), expand_x=True)]
         
@@ -91,9 +91,14 @@ def calcular(expressão):
         tratar_erro("Erro: Divisão por zero")
         return None
 
+    resposta = round(resposta, 6)
+    if resposta == int(resposta):
+        resposta = int(resposta)
+
     if len(str(resposta)) > limite_caracteres_resposta:
         tratar_erro("Display Overflow")
         return None
+
     return resposta
 
 def tratar_erro(mensagem):
@@ -111,17 +116,16 @@ def main():
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == "OFF":
             break
-        elif event in "0123456789+-*/":
+        elif event in "0123456789.+-*/":
             expressão += event
             atualizar_display_superior(expressão)
-        elif event == "C":
+        elif event == "AC":
             expressão = ""
             atualizar_display_superior(expressão)
             atualizar_display_inferior("0.")
         elif event == "CE":
             expressão = ""
             atualizar_display_superior(expressão)
-            atualizar_display_inferior("0.")
         elif event == "←":
             expressão = expressão[:-1]
             atualizar_display_superior(expressão)
