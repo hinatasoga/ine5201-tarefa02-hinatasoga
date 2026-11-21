@@ -4,9 +4,11 @@ import FreeSimpleGUI as sg
 
 # Variáveis e etcs
 linhas_visíveis = 5
+historico = []
 
 # Classe ou funções principais
 def criar_layout():
+    global window
     sg.theme("DarkBlue17")
     layout = [
         [sg.Input("",  key="display_de_cima", size=(1, 1), expand_x=True, justification='left', readonly=True)],
@@ -32,12 +34,48 @@ def atualizar_display_inferior(resposta):
     window["display_debaixo"].update(resposta)
     
 def calcular(expressão):
+    def avaliar(no):
+        if isinstance(no, ast.Expression):
+            return avaliar(no.body)
+        if (
+            isinstance(no, ast.Constant)
+            and isinstance(no.value, (int, float))
+            and not isinstance(no.value, bool)
+        ):
+            return no.value
+        if isinstance(no, ast.BinOp):
+            esquerda = avaliar(no.left)
+            direita = avaliar(no.right)
+            if isinstance(no.op, ast.Add):
+                return esquerda + direita
+            if isinstance(no.op, ast.Sub):
+                return esquerda - direita
+            if isinstance(no.op, ast.Mult):
+                return esquerda * direita
+            if isinstance(no.op, ast.Div):
+                return esquerda / direita
+        if isinstance(no, ast.UnaryOp):
+            valor = avaliar(no.operand)
+            if isinstance(no.op, ast.UAdd):
+                return valor
+            if isinstance(no.op, ast.USub):
+                return -valor
+        raise ValueError("A expressão contém uma operação não permitida.")
+
+    try:
+        arvore = ast.parse(expressão, mode="eval")
+        return avaliar(arvore)
+    except (SyntaxError, ValueError, ZeroDivisionError):
+        tratar_erro("Math ERROR")
+        return None
 
 def tratar_erro(mensagem):
     window["display_de_cima"].update(mensagem, justification="right")
     window["display_debaixo"].update("")
-    
+
 def adicionar_ao_historico(expressão, resposta):
+    historico.append(f"{expressão} = {resposta}")
+    window["historico"].update(values=historico)
 
 def main():
     pass
