@@ -32,6 +32,7 @@ def atualizar_display_superior(expressão):
     if len(expressão) > limite_caracteres_expressao:
         tratar_erro("Display Overflow")
         return False
+    window["display_de_cima"].Widget.configure(justify="left")
     window["display_de_cima"].update(expressão)
     return True
 
@@ -96,7 +97,7 @@ def calcular(expressão):
     return resposta
 
 def tratar_erro(mensagem):
-    window["display_de_cima"].update(mensagem, justification="right")
+    window["display_de_cima"].Widget.configure(justify="right")
     window["display_debaixo"].update("")
 
 def adicionar_ao_historico(expressão, resposta):
@@ -104,7 +105,33 @@ def adicionar_ao_historico(expressão, resposta):
     window["historico"].update(values=historico)
 
 def main():
-    pass
+    window = criar_layout()
+    expressão = ""
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED or event == "OFF":
+            break
+        elif event in "0123456789+-*/":
+            expressão += event
+            atualizar_display_superior(expressão)
+        elif event == "C":
+            expressão = ""
+            atualizar_display_superior(expressão)
+            atualizar_display_inferior("0.")
+        elif event == "CE":
+            expressão = ""
+            atualizar_display_superior(expressão)
+            atualizar_display_inferior("0.")
+        elif event == "←":
+            expressão = expressão[:-1]
+            atualizar_display_superior(expressão)
+        elif event == "=":
+            resposta = calcular(expressão)
+            if resposta is not None:
+                atualizar_display_inferior(resposta)
+                adicionar_ao_historico(expressão, resposta)
+                expressão = str(resposta)
 
-# Loop de eventos da GUI
+    window.close()
+
 main()
