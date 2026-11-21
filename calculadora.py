@@ -34,6 +34,8 @@ def atualizar_display_inferior(resposta):
 def calcular(expressão):
 
 def tratar_erro(mensagem):
+    window["display_de_cima"].update(mensagem, justification="right")
+    window["display_debaixo"].update("")
     
 def adicionar_ao_historico(expressão, resposta):
 
