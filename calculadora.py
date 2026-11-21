@@ -5,6 +5,8 @@ import FreeSimpleGUI as sg
 # Variáveis e etcs
 linhas_visíveis = 5
 historico = []
+limite_caracteres_expressao = 16
+limite_caracteres_resposta = 12
 
 # Classe ou funções principais
 def criar_layout():
@@ -17,7 +19,7 @@ def criar_layout():
         [sg.Button("1", key="1", size=(2, 2)), sg.Button("2", key="2", size=(2, 2)), sg.Button("3", key="3", size=(2, 2)), sg.Button("+", key="+", size=(2, 2), button_color="navy")],
         [sg.Button("4", key="4", size=(2, 2)), sg.Button("5", key="5", size=(2, 2)), sg.Button("6", key="6", size=(2, 2)), sg.Button("-", key="-", size=(2, 2), button_color="navy")],
         [sg.Button("7", key="7", size=(2, 2)), sg.Button("8", key="8", size=(2, 2)), sg.Button("9", key="9", size=(2, 2)), sg.Button("*", key="*", size=(2, 2), button_color="navy")],
-        [sg.Button("0", key="0", size=(2, 2)), sg.Button(".", key=".", size=(2, 2), button_color="navy"), sg.Button("=", key="=", size=(2, 2), button_color="navy"), sg.Button("/", key="/", size=(2, 2), button_color="navy")],
+        [sg.Button("0", key="0", size=(2, 2)), sg.Button("=", key="=", size=(4, 2), button_color="navy"), sg.Button("/", key="/", size=(2, 2), button_color="navy")],
         [sg.Text("Histórico:")],
         [sg.Listbox(values=[], key="historico", size=(1,linhas_visíveis), expand_x=True)]
         
@@ -27,13 +29,26 @@ def criar_layout():
     return window
 
 def atualizar_display_superior(expressão):
+    if len(expressão) > limite_caracteres_expressao:
+        tratar_erro("Display Overflow")
+        return False
     window["display_de_cima"].update(expressão)
+    return True
 
 
 def atualizar_display_inferior(resposta):
-    window["display_debaixo"].update(resposta)
+    texto = str(resposta)
+    if len(texto) > limite_caracteres_resposta:
+        tratar_erro("Display Overflow")
+        return False
+    window["display_debaixo"].update(texto)
+    return True
     
 def calcular(expressão):
+    if len(expressão) > limite_caracteres_expressao:
+        tratar_erro("Display Overflow")
+        return None
+
     def avaliar(no):
         if isinstance(no, ast.Expression):
             return avaliar(no.body)
@@ -64,10 +79,21 @@ def calcular(expressão):
 
     try:
         arvore = ast.parse(expressão, mode="eval")
-        return avaliar(arvore)
-    except (SyntaxError, ValueError, ZeroDivisionError):
-        tratar_erro("Math ERROR")
+        resposta = avaliar(arvore)
+    except SyntaxError:
+        tratar_erro("Erro: Expressão inválida")
         return None
+    except ValueError:
+        tratar_erro("Erro: Expressão inválida")
+        return None
+    except ZeroDivisionError:
+        tratar_erro("Erro: Divisão por zero")
+        return None
+
+    if len(str(resposta)) > limite_caracteres_resposta:
+        tratar_erro("Display Overflow")
+        return None
+    return resposta
 
 def tratar_erro(mensagem):
     window["display_de_cima"].update(mensagem, justification="right")
@@ -81,3 +107,4 @@ def main():
     pass
 
 # Loop de eventos da GUI
+main()
